@@ -449,7 +449,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   inputActions: {fileID: -944628639613478452, guid: a11367402539d7c4886e434ed39b18d6, type: 3}
   moveSpeed: 10
-  jumpForce: 10
+  jumpForce: 4
   maximumJumps: 2
   groundCheck: {fileID: 1478597673}
   groundCheckRadius: 0.1
