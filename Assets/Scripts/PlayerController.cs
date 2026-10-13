@@ -11,6 +11,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float jumpForce = 10f;
 
+    [Header("Ground Check")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.1f;
+
 
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -48,13 +52,15 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         horizontalInput = moveAction.ReadValue<float>();
+        bool isOnGround = isGrounded();
+        Debug.Log(isOnGround);
 
-        if (jumpAction.WasPressedThisFrame())
+        if (jumpAction.WasPressedThisFrame() && isOnGround)
         {
             jumpRequested = true;
         }
 
-
+        
     }
 
     private void FixedUpdate()
@@ -69,5 +75,27 @@ public class PlayerController : MonoBehaviour
 
             jumpRequested = false;
         }
+
+    }
+
+    private bool isGrounded()
+    {
+        if (groundCheck == null)
+        {
+            return false;
+        }
+
+        // collect every rigidbody around the player
+        Collider2D[] hits = Physics2D.OverlapCircleAll(groundCheck.position, groundCheckRadius);
+
+        foreach (Collider2D hit in hits)
+        {
+            if (hit.CompareTag("Ground") && !hit.isTrigger)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
