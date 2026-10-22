@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private Animator animator;
 
+    [Header("Health")]
+    [SerializeField] private int maximumHealth = 3;
+
     [Header("Movement")]
     //[SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float walkSpeed = 5f;
@@ -25,6 +28,8 @@ public class PlayerController : MonoBehaviour
     private InputAction moveAction;
     private InputAction runAction;
     private InputAction jumpAction;
+    private InputAction attackAction;
+    private InputAction defendAction;
     private Rigidbody2D body;
     private SpriteRenderer spriteRenderer;
     private float horizontalInput;
@@ -32,10 +37,17 @@ public class PlayerController : MonoBehaviour
     private int jumpsRemaining = 1;
     private bool isRunning;
 
+    private float lastAttackTime;
+    private bool isDefending;
+    private bool isDead;
+    private int attackStep;
+    private int currentHealth;
+
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        currentHealth = maximumHealth;
         if (inputActions == null) 
         {
             Debug.LogError("Assign input controls to the player.");
@@ -47,6 +59,8 @@ public class PlayerController : MonoBehaviour
         moveAction = playerActions.FindAction("Move", true);
         jumpAction = playerActions.FindAction("Jump", true);
         runAction = playerActions.FindAction("Run", true);
+        attackAction = playerActions.FindAction("Attack", true);
+        defendAction = playerActions.FindAction("Defend", true);
     }
 
     private void OnEnable()
@@ -54,6 +68,8 @@ public class PlayerController : MonoBehaviour
         moveAction?.Enable();
         jumpAction?.Enable();
         runAction?.Enable();
+        attackAction?.Enable();
+        defendAction?.Enable();
     }
 
     private void OnDisable()
@@ -61,14 +77,16 @@ public class PlayerController : MonoBehaviour
         moveAction?.Disable();
         jumpAction?.Disable();
         runAction?.Disable();
+        attackAction?.Disable();
+        defendAction?.Disable();
+        jumpRequested = false;
     }
 
     private void Update()
     {
-        horizontalInput = moveAction.ReadValue<float>();
+        horizontalInput = isDead ? 0f : moveAction.ReadValue<float>();
         bool isOnGround = isGrounded();
-        isRunning = runAction.IsPressed() && Mathf.Abs(horizontalInput) > 0.05f;
-        Debug.Log(isOnGround + " " + isRunning);
+        isRunning = !isDead && runAction.IsPressed() && Mathf.Abs(horizontalInput) > 0.05f;
 
         if (jumpAction.WasPressedThisFrame())
         {
@@ -96,8 +114,10 @@ public class PlayerController : MonoBehaviour
             jumpsRemaining = maximumJumps - 1;
         }
 
+        float speed = isRunning ? runSpeed : walkSpeed;
+
         body.linearVelocity =
-            new Vector2(horizontalInput * walkSpeed, body.linearVelocity.y);
+            new Vector2(horizontalInput * speed, body.linearVelocity.y);
 
         if (jumpRequested)
         {
@@ -116,6 +136,12 @@ public class PlayerController : MonoBehaviour
 
     private bool isGrounded()
     {
+
+        if (body != null && body.linearVelocity.y > 0f)
+        {
+            return false;
+        }
+
         if (groundCheck == null)
         {
             return false;
@@ -126,7 +152,7 @@ public class PlayerController : MonoBehaviour
 
         foreach (Collider2D hit in hits)
         {
-            if (hit.CompareTag("Ground") && !hit.isTrigger)
+            if (hit.CompareTag("Ground") && !hit.isTrigger && hit.attachedRigidbody != body)
             {
                 return true;
             }
