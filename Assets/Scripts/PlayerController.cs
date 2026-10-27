@@ -88,20 +88,94 @@ public class PlayerController : MonoBehaviour
         bool isOnGround = isGrounded();
         isRunning = !isDead && runAction.IsPressed() && Mathf.Abs(horizontalInput) > 0.05f;
 
-        if (jumpAction.WasPressedThisFrame())
+        bool wasDefending = isDefending;
+
+        // check if we are defending
+        isDefending = !isDead && isOnGround && defendAction.IsPressed();
+
+        //play defend animation
+        if (isDefending && !wasDefending)
+        {
+            animator.SetTrigger("playDefend");
+        }
+
+        if (!isDead && !isDefending && jumpAction.WasPressedThisFrame())
         {
             jumpRequested = true;
+        }
+
+        if (!isDead && !isDefending && attackAction.IsPressed())
+        {
+            // play attack
+            PlayAttack(isOnGround);
         }
 
         animator.SetFloat("speed", Mathf.Abs(horizontalInput));
         animator.SetBool("isRunning", isRunning);
         animator.SetBool("isGrounded", isOnGround);
+        animator.SetBool("isDefending", isDefending);
+        animator.SetBool("isDead", isDead);
 
         // check for the sprite flip
-        if (Mathf.Abs(horizontalInput) > 0.05f)
+        if (!isDead && Mathf.Abs(horizontalInput) > 0.05f)
         {
             spriteRenderer.flipX = horizontalInput < 0f;
         }
+    }
+
+    private void PlayAttack(bool isGrounded)
+    {
+        if (isGrounded && isRunning)
+        {
+            animator.SetTrigger("playRunAttack");
+            return;
+        }
+
+        if (Time.time - lastAttackTime > 1f)
+        {
+            attackStep = 0;
+        }
+
+        // cycle through the attack steps
+        attackStep = attackStep % 3 + 1;
+        lastAttackTime = Time.time;
+        animator.SetTrigger("playAttack" + attackStep);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (isDead || damage <= 0)
+        {
+            return;
+        }
+
+        if (isDefending)
+        {
+            animator.SetTrigger("playDefend");
+            return;
+        }
+
+        currentHealth = Mathf.Max(0, currentHealth - damage);
+
+        if (currentHealth <= 0)
+        {
+            isDead = true;
+            body.linearVelocity = Vector2.zero;
+            animator.SetBool("isDead", true);
+        }
+        else {
+            animator.SetTrigger("playHurt");
+        }
+
+        Debug.Log(currentHealth);
+    }
+
+    public void Revive()
+    {
+        currentHealth = maximumHealth;
+        isDead = false;
+        jumpsRemaining = 1;
+        animator.SetBool("isDead", false);
     }
 
     private void FixedUpdate()
@@ -115,9 +189,10 @@ public class PlayerController : MonoBehaviour
         }
 
         float speed = isRunning ? runSpeed : walkSpeed;
+        float movement = isDead || isDefending ? 0f : horizontalInput * speed;
 
         body.linearVelocity =
-            new Vector2(horizontalInput * speed, body.linearVelocity.y);
+            new Vector2(movement, body.linearVelocity.y);
 
         if (jumpRequested)
         {
