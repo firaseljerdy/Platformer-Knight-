@@ -20,5 +20,8 @@ public class PlayerDamageTester : MonoBehaviour
 
         if (keyboard.hKey.wasPressedThisFrame)
             player.TakeDamage(damageAmount);
+
+        if (keyboard.rKey.wasPressedThisFrame)
+            player.Revive();
     }
 }
