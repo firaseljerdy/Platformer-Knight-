@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour
             jumpRequested = true;
         }
 
-        if (!isDead && !isDefending && attackAction.IsPressed())
+        if (!isDead && !isDefending && attackAction.WasPressedThisFrame())
         {
             // play attack
             PlayAttack(isOnGround);
