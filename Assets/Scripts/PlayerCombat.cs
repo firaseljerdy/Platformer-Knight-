@@ -18,25 +18,51 @@ public class PlayerCombat : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+    private void LateUpdate()
+    {
+        UpdateAttackPoint();
+    }
+
+    private void UpdateAttackPoint()
+    {
+        if (attackPoint == null || spriteRenderer == null)
+            return;
+
+        Vector3 position = attackPoint.localPosition;
+        position.x = Mathf.Abs(position.x) * (spriteRenderer.flipX ? -1f : 1f);
+        attackPoint.localPosition = position;
+    }
+
     public void DealDamage()
     {
-        if (player != null || player.IsDead || player.IsDefending)
+        Debug.Log(player + " " + !player.IsDead + " " + !player.IsDefending);
+        if (player == null || player.IsDead || player.IsDefending)
         {
             return;
         }
-
+        Debug.Log("here");
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackPoint.position, attackRadius, enemyLayers);
 
         // Enemy with multiple colliders can still take one hit
         HashSet<EnemyHealth> damagedEnemies = new HashSet<EnemyHealth>();
 
+        Debug.Log(damagedEnemies);
         foreach (Collider2D hit in hits)
         {
-            EnemyHealth enemy = hit.GetComponentInParent<EnemyHealth>();
+            EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
             if (enemy != null && damagedEnemies.Add(enemy))
             {
                 enemy.TakeDamage(attackDamage);
             }
         }
-     }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (attackPoint != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(attackPoint.position, attackRadius);
+        }
+    }
 }
