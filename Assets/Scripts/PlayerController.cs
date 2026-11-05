@@ -23,8 +23,6 @@ public class PlayerController : MonoBehaviour
     [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckRadius = 0.1f;
-
-
     private InputAction moveAction;
     private InputAction runAction;
     private InputAction jumpAction;
@@ -36,13 +34,14 @@ public class PlayerController : MonoBehaviour
     private bool jumpRequested;
     private int jumpsRemaining = 1;
     private bool isRunning;
-
     private float lastAttackTime;
     private bool isDefending;
     private bool isDead;
     private int attackStep;
     private int currentHealth;
 
+    public bool IsDead => isDead;
+    public bool IsDefending => isDefending;
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
