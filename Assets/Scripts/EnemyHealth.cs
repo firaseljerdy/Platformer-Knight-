@@ -4,8 +4,10 @@ using System.Collections;
 public class EnemyHealth : MonoBehaviour
 {
     [SerializeField, Min(1)] private int maximumHealth = 3;
+    [SerializeField] Transform healthFill;
     [SerializeField] SpriteRenderer spriteRenderer;
     private int currentHealth;
+    private Vector3 fullHealthScale;
     private Coroutine hitFlash;
     private Color normalColor;
 
@@ -15,7 +17,11 @@ public class EnemyHealth : MonoBehaviour
     private void Awake()
     {
         currentHealth = maximumHealth;
-        Debug.Log("current health of enemy:" + currentHealth);
+
+        if (healthFill != null)
+        {
+            fullHealthScale = healthFill.localScale;
+        }
 
         if (spriteRenderer != null)
         {
@@ -28,6 +34,12 @@ public class EnemyHealth : MonoBehaviour
         if (currentHealth <= 0 || damage <= 0) return;
 
         currentHealth = Mathf.Max(0, currentHealth - damage);
+        if (healthFill != null)
+        {
+            Vector3 scale = fullHealthScale;
+            scale.x *= (float)currentHealth / maximumHealth;
+            healthFill.localScale = scale;
+        }
 
         Debug.Log("current health of enemy:"  + currentHealth);
 
