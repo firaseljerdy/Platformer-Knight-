@@ -43,6 +43,13 @@ public class ParallaxLayer : MonoBehaviour
             0f);
 
         if (!loopHorizontally || tileWidth <= 0f) return;
+
+        float distance = cameraTransform.position.x - transform.position.x;
+        if (Mathf.Abs(distance) > tileWidth * 0.5f)
+        {
+            float jumps = Mathf.Round(distance / tileWidth);
+            transform.position += Vector3.right * (jumps * tileWidth);
+        }
     }
 
 }
