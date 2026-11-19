@@ -350,7 +350,7 @@ GameObject:
   - component: {fileID: 299319877}
   - component: {fileID: 299319876}
   - component: {fileID: 299319880}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Slime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -469,6 +469,8 @@ MonoBehaviour:
   wanderSpeed: 1.2
   wanderStepTime: {x: 1, y: 3}
   wanderPauseChance: 0.3
+  probeRadius: 0.1
+  probeDepth: 0.25
 --- !u!1 &357083946
 GameObject:
   m_ObjectHideFlags: 0
@@ -1404,7 +1406,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1379866064}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Health Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1575,7 +1577,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1429209218}
   - component: {fileID: 1429209219}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Health Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2114,7 +2116,7 @@ GameObject:
   - component: {fileID: 1988730639}
   - component: {fileID: 1988730640}
   - component: {fileID: 1988730641}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Slime Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2227,7 +2229,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2055513658}
   - component: {fileID: 2055513659}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
